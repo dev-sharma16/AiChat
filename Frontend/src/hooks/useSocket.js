@@ -8,7 +8,10 @@ export const useSocket = (serverUrl) => {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    const newSocket = io(serverUrl);
+    const newSocket = io(serverUrl,{
+      transports: ['polling'], //* due to free plan of RENDER temperarily switching to polling from webSockets
+      withCredentials: true
+    });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
