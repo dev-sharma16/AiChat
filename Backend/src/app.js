@@ -6,7 +6,7 @@ const app = express();
 // Environment-based CORS configuration
 const allowedOrigins = [
     'http://localhost:5173', // Local development
-    'https://your-app-name.vercel.app', // Replace with your actual Vercel URL
+    'https://ai-chat-sandy-kappa.vercel.app', // actual Vercel URL
     process.env.FRONTEND_URL // Environment variable for production
 ].filter(Boolean);
 
