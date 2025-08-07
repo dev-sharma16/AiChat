@@ -5,9 +5,10 @@ import ChatInput from './components/ChatInput';
 import ConnectionStatus from './components/ConnectionStatus';
 import TypingIndicator from './components/TypingIndicator';
 import WelcomeMessage from './components/WelcomeMessage';
+import config from './config/config';
 
 function App() {
-  const { isConnected, messages, isTyping, sendMessage } = useSocket('http://localhost:3000');
+  const { isConnected, messages, isTyping, sendMessage } = useSocket(config.BACKEND_URL);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
 
