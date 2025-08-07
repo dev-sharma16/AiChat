@@ -5,9 +5,17 @@ const { Server } = require("socket.io");
 const generateResponse = require('./src/service/ai.service')
 
 const httpServer = createServer(app);
+
+// Environment-based CORS configuration
+const allowedOrigins = [
+    "http://localhost:5173", // Local development
+    "https://your-app-name.vercel.app", // Replace with your actual Vercel URL
+    process.env.FRONTEND_URL // Environment variable for production
+].filter(Boolean); // Remove undefined values
+
 const io = new Server(httpServer, { 
     cors: {
-        origin: "http://localhost:5173",
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -58,6 +66,8 @@ io.on("connection", (socket) => {
     })
 });
 
-httpServer.listen(3000, ()=>{
+const PORT = process.env.PORT || 3000
+
+httpServer.listen(PORT, ()=>{
     console.log("App is running on PORT: 3000");
 })
