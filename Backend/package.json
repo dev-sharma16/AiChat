@@ -10,12 +10,20 @@
     "dev": "npx nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["ai", "chat", "socket.io", "express"],
+  "keywords": [
+    "ai",
+    "chat",
+    "socket.io",
+    "express",
+    "mcp"
+  ],
   "author": "Dev Sharma",
   "license": "ISC",
-  "description": "AI Chat Backend with Socket.IO and Gemini AI",
+  "description": "AI Chat Backend with Socket.IO, Gemini AI, and MCP Tools",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@modelcontextprotocol/sdk": "^1.17.2",
+    "axios": "^1.11.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
