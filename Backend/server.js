@@ -3,8 +3,10 @@ const app = require('./src/app')
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const generateResponse = require('./src/service/ai.service')
+const MCPTools = require('./src/service/mcp.service');
 
 const httpServer = createServer(app);
+const mcpTools = new MCPTools();
 
 // Environment-based CORS configuration
 const allowedOrigins = [
@@ -53,16 +55,19 @@ io.on("connection", (socket) => {
         })
         // console.log(data); 
         
-        const response = await generateResponse(chatHistory)
+        const response = await generateResponse(chatHistory, data)
         console.log("AI-Response: ",response);
         
         chatHistory.push({
             role: "model",
-            parts: [{ text: response}]
+            parts: [{ text: response.text}]
         })
 
         //? 'emit' is used to fire the event from the server/client side like sending a response to the user
-        socket.emit("message-response", {response})
+        socket.emit("message-response", {
+            response: response.text,
+            toolUsed: response.toolsUsed 
+        })
     })
 });
 
@@ -70,4 +75,5 @@ const PORT = process.env.PORT || 3000
 
 httpServer.listen(PORT, ()=>{
     console.log("App is running on PORT: 3000");
+    console.log("Available MCP Tools:", mcpTools.getAvailableTools().map(t => t.name))
 })
