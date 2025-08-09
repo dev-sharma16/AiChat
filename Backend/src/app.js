@@ -1,5 +1,7 @@
 const express = require('express')
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/auth.routes')
 
 const app = express();
 
@@ -26,12 +28,24 @@ app.use(cors({
     credentials: true
 }));
 
+app.use(express.json())
+
+app.use(cookieParser())
+
+app.use('/auth', authRoutes);
+
 app.get('/',(req,res)=>{
     res.status(200).json({
         message: "AI Chat Backend is running!", 
         status: "healthy",
         timestamp: new Date().toISOString()
     })
+})
+
+const PORT = process.env.EXPRESS_PORT
+
+app.listen(PORT || 3000,()=>{
+    console.log(`Express Server is started at PORT : ${PORT}`);
 })
 
 module.exports = app;

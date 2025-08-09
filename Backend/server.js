@@ -4,6 +4,9 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { setupChatRoutes } = require('./src/routes/chat.routes');
 const MCPTools = require('./src/service/mcp.service');
+const connectDb = require('./src/db/db')
+
+connectDb();
 
 const httpServer = createServer(app);
 const mcpTools = new MCPTools();
@@ -27,9 +30,9 @@ const io = new Server(httpServer, {
 //* Setup Socket.io chat routes
 setupChatRoutes(io);
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.SOCKET_IO_PORT || 3007
 
 httpServer.listen(PORT, ()=>{
-    console.log("App is running on PORT: 3000");
+    console.log(`Socket Io server is running on PORT: ${PORT}`);
     console.log("Available MCP Tools:", mcpTools.getAvailableTools().map(t => t.name))
 })
