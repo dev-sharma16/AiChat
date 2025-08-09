@@ -49,7 +49,9 @@ async function registerUser(req,res){
 async function loginUser(req,res){
     const {usernameOrEmail, password} = req.body
 
-    const isUserExists = await User.findOne({ usernameOrEmail })
+    const isUserExists = await User.findOne({ 
+        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+    })
     if(!isUserExists) return res.status(400).json({ success:false,message:"User not found"})
     
     const isPasswordValid = await bcrypt.compare(password,isUserExists.password)
