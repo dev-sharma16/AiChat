@@ -1,6 +1,6 @@
 const config = {
     development: {
-        BACKEND_URL: 'http://localhost:3000'
+        BACKEND_URL: 'http://localhost:3007'
     },
     production: {
         BACKEND_URL: import.meta.env.VITE_BACKEND_URL || 'https://aichat-lza8.onrender.com'
