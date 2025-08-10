@@ -4,8 +4,8 @@ const bcrypt = require('bcryptjs')
 
 const cookieOptions = {
     httpOnly: true,
-    secure: false, // set to true in production with HTTPS
-    sameSite: "Lax", // or "None" with secure: true if cross-site
+    secure: process.env.NODE_ENV === 'production', // Enable secure cookies in production
+    sameSite: process.env.NODE_ENV === 'production' ? "None" : "Lax", // Cross-site for production
     maxAge: 1000 * 60 * 60 * 24, // 24 hours in milliseconds
     path: "/",
 };
