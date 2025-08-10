@@ -30,7 +30,8 @@ const io = new Server(httpServer, {
 //* Setup Socket.io chat routes
 setupChatRoutes(io);
 
-const PORT = process.env.SOCKET_IO_PORT || 3007
+// const PORT = process.env.SOCKET_IO_PORT || 3007
+const PORT = process.env.PORT || 3000
 
 httpServer.listen(PORT, ()=>{
     console.log(`Socket Io server is running on PORT: ${PORT}`);
