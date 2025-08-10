@@ -20,7 +20,7 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border-t border-gray-200 p-4">
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-gray-600 p-4">
       <div className="flex items-end gap-3 max-w-4xl mx-auto">
         <div className="flex-1 relative">
           <textarea
@@ -29,7 +29,7 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
             onKeyPress={handleKeyPress}
             placeholder="Type your message here..."
             disabled={disabled}
-            className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-32 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 pr-12 border border-gray-300 dark:bg-slate-500 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-32 disabled:opacity-50 disabled:cursor-not-allowed"
             rows={1}
             style={{
               minHeight: '48px',
