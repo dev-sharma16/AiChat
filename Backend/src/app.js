@@ -42,10 +42,10 @@ app.get('/',(req,res)=>{
     })
 })
 
-const PORT = process.env.EXPRESS_PORT
+// const PORT = process.env.EXPRESS_PORT
 
-app.listen(PORT || 3000,()=>{
-    console.log(`Express Server is started at PORT : ${PORT}`);
-})
+// app.listen(PORT || 3000,()=>{
+//     console.log(`Express Server is started at PORT : ${PORT}`);
+// })
 
 module.exports = app;
