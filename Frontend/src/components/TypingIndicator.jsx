@@ -8,11 +8,11 @@ const TypingIndicator = () => {
         <Bot className="w-4 h-4 text-white" />
       </div>
       
-      <div className="bg-white text-gray-800 rounded-2xl rounded-bl-md px-4 py-3 border border-gray-100 shadow-sm">
+      <div className="bg-gradient-to-br from-purple-500 to-indigo-600 text-gray-800 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
         <div className="flex gap-1">
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div className="w-2 h-2 bg-gray-100 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+          <div className="w-2 h-2 bg-gray-100 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+          <div className="w-2 h-2 bg-gray-100 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
         </div>
       </div>
     </div>
