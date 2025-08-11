@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import config from '../../config/config';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = config.BACKEND_URL;
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
