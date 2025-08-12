@@ -13,10 +13,11 @@ export const loadUser = createAsyncThunk(
   'auth/loadUser',
   async (_, { rejectWithValue }) => {
     try {
-      const token = Cookies.get('user');
-      if (!token) {
-        throw new Error('No token found');
-      }
+      //* removing this line bcz sending the cookie with get request gonna managed by browser, the cookies i set is httpOnly so it can't be accessed by JS.
+      // const token = Cookies.get('user'); 
+      // if (!token) {
+      //   throw new Error('No token found');
+      // }
       
       const response = await axios.get(`${API_BASE_URL}/auth/user`);
       return response.data.user;
