@@ -85,7 +85,7 @@ async function currentUser(req,res){
 }
 
 async function logoutUser(req,res){
-    res.clearCookie("user")
+    res.clearCookie("user", cookieOptions)
     
     res
     .status(200)
