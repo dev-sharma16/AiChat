@@ -7,8 +7,10 @@ const { setupSocketServer }  = require('./src/socket/socket.server')
 const { setupChatRoutes } = require('./src/routes/chat.routes');
 const MCPTools = require('./src/service/mcp.service');
 const connectDb = require('./src/db/db')
+const { connectRedisDb } = require('./src/db/redisDb')
 
-connectDb();
+connectDb(); //? db connection for mongo db
+connectRedisDb(); //? db connection for redis db
 
 // const httpServer = createServer(app);
 const mcpTools = new MCPTools();
