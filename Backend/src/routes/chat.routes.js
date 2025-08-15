@@ -1,4 +1,4 @@
-const { handleChatMessage, handleChatSave, resetChatSession } = require('../controllers/chat.controller');
+const { handleChatMessage, handleChatSave, resetChatSession, handleLoadAllChats } = require('../controllers/chat.controller');
 const authMiddleware = require('../middleware/auth.middleware')
 const cookieParser = require('cookie-parser')
 
@@ -25,6 +25,8 @@ const setupChatRoutes = (io) => {
         socket.data.redisKey = `${socket.request.user._id}:current`;
 
         resetChatSession();
+
+        handleLoadAllChats(socket, socket.request.user._id);
         
         //? 'on' is used to listen the event from the server/client side like receiving/processing a response from the user
         socket.on("disconnect", async(reason) => {
