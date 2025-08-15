@@ -61,6 +61,10 @@ const handleChatMessage = async (socket, data) => {
 const handleChatSave = async (socket) => {
     if (conversationSaved) return; // prevent duplicate save
     conversationSaved = true;
+    
+    //if chathistory is emmpty then dont save into db
+    if(!chatHistory?.[0]?.parts?.text) return 
+
     try {
         await Conversation.create({
             userId: socket.request.user._id,
@@ -86,10 +90,34 @@ const resetChatSession = () => {
     conversationSaved = false;
 };
 
+const handleLoadAllChats = async (socket, userId) => {
+    try {
+        console.log("fetching all the chats.!");
+        if(!userId){
+            throw new Error 
+        }
+
+        const response = await Conversation.find( {userId} )
+
+        console.log(response);
+    
+        socket.emit("load-all-chats", {
+            message: "chats fetched successfully",
+            chats: response
+        });
+    } catch (error) {
+        console.error("Error fetching all chats:", error);
+        socket.emit("message-error", {
+            error: "Failed to fetch all chats"
+        });
+    }
+}
+
 module.exports = {
     handleChatMessage,
     chatHistory,
     handleChatSave,
-    resetChatSession
+    resetChatSession,
+    handleLoadAllChats
 };
 
