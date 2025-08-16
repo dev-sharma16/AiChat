@@ -37,21 +37,6 @@ const ChatMessage = ({ message, isUser, timestamp }) => {
                   ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
                   ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
                   li: ({ children }) => <li className="mb-1">{children}</li>,
-                  code: ({ inline, children }) => 
-                    inline ? (
-                      <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">
-                        {children}
-                      </code>
-                    ) : (
-                      <code className="block bg-gray-100 p-2 rounded text-xs font-mono overflow-x-auto">
-                        {children}
-                      </code>
-                    ),
-                  pre: ({ children }) => (
-                    <pre className="bg-gray-100 p-2 rounded text-xs font-mono overflow-x-auto mb-2">
-                      {children}
-                    </pre>
-                  ),
                   blockquote: ({ children }) => (
                     <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-2">
                       {children}
@@ -69,19 +54,37 @@ const ChatMessage = ({ message, isUser, timestamp }) => {
                       {children}
                     </a>
                   ),
+                  pre: ({ children }) => (
+                    <pre className="bg-gray-100 p-2 rounded text-xs font-mono overflow-x-auto mb-2">
+                      {children}
+                    </pre>
+                  ),
                   code: ({ inline, className, children }) => {
                     const match = /language-(\w+)/.exec(className || '');
-                    return !inline && match ? (
-                      <SyntaxHighlighter
-                        style={tomorrow}
-                        language={match[1]}
-                        PreTag="div"
-                        className="text-xs"
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
-                    ) : (
-                      <code className="bg-indigo-700 px-1 py-0.5 rounded text-xs font-mono">
+                    // Block code with syntax highlighting
+                    if (!inline && match) {
+                      return (
+                        <SyntaxHighlighter
+                          style={tomorrow}
+                          language={match[1]}
+                          PreTag="div"
+                          className="text-xs"
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      );
+                    }
+                    // Inline code
+                    if (inline) {
+                      return (
+                        <code className="bg-indigo-700 px-1 py-0.5 rounded text-xs font-mono">
+                          {children}
+                        </code>
+                      );
+                    }
+                    // Block code without language specification
+                    return (
+                      <code className="block bg-gray-800 p-2 rounded text-xs font-mono overflow-x-auto">
                         {children}
                       </code>
                     );
