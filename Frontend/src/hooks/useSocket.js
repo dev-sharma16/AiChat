@@ -6,6 +6,7 @@ export const useSocket = (serverUrl) => {
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [allChats, setAllChats] = useState([]); 
 
   useEffect(() => {
     const newSocket = io(serverUrl,{
@@ -35,6 +36,30 @@ export const useSocket = (serverUrl) => {
       setMessages(prev => [...prev, aiMessage]);
     });
 
+    newSocket.on('load-all-chats', (data) => {
+      const response = data
+      console.log(response);
+      setAllChats(response.chats);
+    })
+
+    newSocket.on('new-chat-started', () => {
+      setMessages([]);
+      console.log('New chat Started.!');
+    })
+
+    newSocket.on('reloaded-chat', (data) => {
+      const formatted = Array.isArray(data)
+      ? data.map(m => ({
+          id: m._id || `${m.role}-${Date.now()}-${Math.random()}`,
+          text: m?.parts?.text ?? '',
+          isUser: m.role === 'user',
+          timestamp: new Date(m.createdAt || Date.now())
+        }))
+      : [];
+      setIsTyping(false);
+      setMessages(formatted);
+    })
+
     return () => {
       newSocket.close();
     };
@@ -55,10 +80,21 @@ export const useSocket = (serverUrl) => {
     socket.emit('message', message);
   };
 
+  const newChat = () => {
+    socket.emit('newChat')
+  }  
+
+  const reloadPreviousChat = (chat) => {
+    socket.emit('reload-chat', chat)
+  }
+
   return {
     isConnected,
     messages,
     isTyping,
-    sendMessage
+    sendMessage,
+    allChats,
+    newChat,
+    reloadPreviousChat
   };
 };
