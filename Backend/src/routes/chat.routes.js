@@ -1,4 +1,10 @@
-const { handleChatMessage, handleChatSave, resetChatSession, handleLoadAllChats } = require('../controllers/chat.controller');
+const { 
+    handleChatMessage, 
+    handleChatSave, 
+    resetChatSession, 
+    handleLoadAllChats, 
+    handleLoadChat 
+} = require('../controllers/chat.controller');
 const authMiddleware = require('../middleware/auth.middleware')
 const cookieParser = require('cookie-parser')
 
@@ -34,10 +40,24 @@ const setupChatRoutes = (io) => {
             console.log("A user is disconnected.!");
         });
 
-        socket.on("message", async (data) => {
+        socket.on("message", async(data) => {
             //? in the 'data' we receive the data from frontend in form of text or json or binary(for files)
             await handleChatMessage(socket, data);
         });
+
+        socket.on("newChat", async() => {
+            await handleChatSave(socket);
+            resetChatSession();
+            console.log("Previous chat was saved and new chat started");
+
+            socket.emit("new-chat-started");
+
+            await handleLoadAllChats(socket, socket.request.user._id)
+        })
+
+        socket.on("reload-chat", async(data) => {
+            await handleLoadChat(socket, data)
+        })
     });
 };
 

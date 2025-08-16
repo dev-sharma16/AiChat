@@ -61,8 +61,8 @@ const handleChatMessage = async (socket, data) => {
 const handleChatSave = async (socket) => {
     if (conversationSaved) return; // prevent duplicate save
     conversationSaved = true;
-    
-    //if chathistory is emmpty then dont save into db
+
+    //if chathistory is empty then dont save into db
     if(!chatHistory?.[0]?.parts?.text) return 
 
     try {
@@ -113,11 +113,44 @@ const handleLoadAllChats = async (socket, userId) => {
     }
 }
 
+const handleLoadChat = async (socket, chat) => {
+    const reloadedCovo = await Conversation.findById({ _id: chat._id });
+    if(!reloadedCovo) throw new Error("Chat not found");
+
+    const redisKey = socket.data.redisKey
+    await client.del(redisKey);
+
+    resetChatSession();
+
+    for(const msg of reloadedCovo.messages){
+        chatHistory.push({
+            role: msg.role,
+            parts: { text: msg.parts.text }
+        })
+
+        await client.rPush(
+            redisKey,
+            JSON.stringify({
+                role: msg.role,
+                parts: { text: msg.parts.text }
+            })
+        )
+    }
+
+    //todo: make a permanent solution for updating doc rather then deleting old one and then creating new one
+    await Conversation.findByIdAndDelete({_id:chat._id })
+
+    console.log(`Conversation ${chat._id} loaded back into Redis`);
+
+    socket.emit("reloaded-chat", reloadedCovo.messages)
+}
+
 module.exports = {
     handleChatMessage,
     chatHistory,
     handleChatSave,
     resetChatSession,
-    handleLoadAllChats
+    handleLoadAllChats,
+    handleLoadChat
 };
 
