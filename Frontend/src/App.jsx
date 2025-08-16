@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from './store/store';
 import { loadUser } from './store/slices/authSlice';
 import { setTheme } from './store/slices/themeSlice';
+import { useSocket } from './hooks/useSocket';
+import config from './config/config';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ChatPage from './pages/ChatPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useSocket } from './hooks/useSocket';
-import config from './config/config';
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -68,11 +68,21 @@ const AppContent = () => {
 
 // Separate component for chat page with socket connection
 const ChatPageWithSocket = () => {
-  const { isConnected } = useSocket(config.BACKEND_URL);
+  const socketApi = useSocket(config.BACKEND_URL);
+  const { isConnected } = socketApi;
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <Layout showConnectionStatus={true} isConnected={isConnected}>
-      <ChatPage />
+    <Layout 
+      showConnectionStatus={true}
+      isConnected={isConnected} 
+      onToggleSidebar={() => setIsSidebarOpen(true)}
+    >
+      <ChatPage 
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        socketApi={socketApi}
+      />
     </Layout>
   );
 };

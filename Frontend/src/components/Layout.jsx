@@ -1,12 +1,12 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Sun, Moon, LogOut, User } from 'lucide-react';
+import { Bot, Sun, Moon, LogOut, User, Menu } from 'lucide-react';
 import { toggleTheme } from '../store/slices/themeSlice';
 import { logoutUser } from '../store/slices/authSlice';
 import ConnectionStatus from './ConnectionStatus';
 
-const Layout = ({ children, showConnectionStatus = false, isConnected = false }) => {
+const Layout = ({ children, showConnectionStatus = false, isConnected = false, onToggleSidebar}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { mode } = useSelector((state) => state.theme);
@@ -27,6 +27,17 @@ const Layout = ({ children, showConnectionStatus = false, isConnected = false })
       <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* Sidebar Toggle - only show on chat page */}
+            {onToggleSidebar && (
+              <button
+                onClick={onToggleSidebar}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                title="Toggle chat history"
+              >
+                <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </button>
+            )}
+
             <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg p-2">
               <Bot className="w-6 h-6 text-white" />
             </div>
