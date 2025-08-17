@@ -38,7 +38,7 @@ export const useSocket = (serverUrl) => {
 
     newSocket.on('load-all-chats', (data) => {
       const response = data
-      console.log(response);
+      // console.log(response);
       setAllChats(response.chats);
     })
 

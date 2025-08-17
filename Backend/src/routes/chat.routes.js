@@ -30,8 +30,10 @@ const setupChatRoutes = (io) => {
         // Create a stable redis key for this user
         socket.data.redisKey = `${socket.request.user._id}:current`;
 
+        // reseting the session
         resetChatSession();
 
+        // loading all the previous user chats
         handleLoadAllChats(socket, socket.request.user._id);
         
         //? 'on' is used to listen the event from the server/client side like receiving/processing a response from the user
