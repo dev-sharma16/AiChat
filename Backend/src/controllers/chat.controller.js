@@ -16,6 +16,7 @@ const chatHistory = [
 
 let conversationSaved = false;
 
+//* this controller handle receiving the user message and sending the ai response to the user and store the current conovo in redis
 const handleChatMessage = async (socket, data) => {
     try {
         console.log("message is received..!");
@@ -58,6 +59,7 @@ const handleChatMessage = async (socket, data) => {
     }
 };
 
+//* this controller saves the current convo in mongo db 
 const handleChatSave = async (socket) => {
     if (conversationSaved) return; // prevent duplicate save
     conversationSaved = true;
@@ -66,11 +68,25 @@ const handleChatSave = async (socket) => {
     if(!chatHistory?.[0]?.parts?.text) return 
 
     try {
-        await Conversation.create({
+        const filter = {
             userId: socket.request.user._id,
-            title: chatHistory?.[0]?.parts?.text,
-            messages: chatHistory
-        })
+            title: chatHistory?.[0]?.parts?.text
+        }
+
+        //* UPSERT METHOD : checking if document is existed or not if it is then it update the the messages and if not then create it
+        await Conversation.findOneAndUpdate (
+            filter,
+            {
+                $set: {
+                    userId: socket.request.user._id,
+                    title: chatHistory?.[0]?.parts?.text,
+                    messages: chatHistory, // full snapshot overwrite
+                    updatedAt: new Date()
+                }
+            },
+            //by turning upsert this true mongodb can update the doc if its exists or create new if it's not 
+            { upsert: true } 
+        )
 
         // Delete Redis cache for this session
         const redisKey = socket.data.redisKey
@@ -90,6 +106,7 @@ const resetChatSession = () => {
     conversationSaved = false;
 };
 
+//* this controller loads all the previous chats from mongodb of the user and send them to frontend
 const handleLoadAllChats = async (socket, userId) => {
     try {
         console.log("fetching all the chats.!");
@@ -113,6 +130,8 @@ const handleLoadAllChats = async (socket, userId) => {
     }
 }
 
+
+//* this controller open the previous chat in current redis and in current covo session so user can continue
 const handleLoadChat = async (socket, chat) => {
     const reloadedCovo = await Conversation.findById({ _id: chat._id });
     if(!reloadedCovo) throw new Error("Chat not found");
@@ -135,10 +154,7 @@ const handleLoadChat = async (socket, chat) => {
                 parts: { text: msg.parts.text }
             })
         )
-    }
-
-    //todo: make a permanent solution for updating doc rather then deleting old one and then creating new one
-    await Conversation.findByIdAndDelete({_id:chat._id })
+    }  
 
     console.log(`Conversation ${chat._id} loaded back into Redis`);
 
