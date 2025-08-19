@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useSocket } from '../hooks/useSocket';
-import config from '../config/config';
 import ChatMessage from '../components/ChatMessage';
 import ChatInput from '../components/ChatInput';
 import TypingIndicator from '../components/TypingIndicator';
@@ -28,7 +26,7 @@ const ChatPage = ({ isSidebarOpen, setIsSidebarOpen , socketApi}) => {
 
   const handleSelectChat = (chat) => {
     // Load selected chat messages
-    console.log('Selected chat:', chat);
+    // console.log('Selected chat:', chat);
     reloadPreviousChat(chat);
     setIsSidebarOpen(false)
   };
