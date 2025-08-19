@@ -58,6 +58,9 @@ const setupChatRoutes = (io) => {
         })
 
         socket.on("reload-chat", async(data) => {
+            await handleChatSave(socket);
+            resetChatSession();
+            console.log("Previous chat is updated");
             await handleLoadChat(socket, data)
         })
     });
