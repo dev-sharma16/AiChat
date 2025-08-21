@@ -1,10 +1,11 @@
 const { GoogleGenerativeAI  } = require("@google/generative-ai")
 const MCPTools = require('./mcp.service');
+const { GoogleGenAI } = require('@google/genai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const mcpTools = new MCPTools();
 
-async function generateResponse(chatHistory, userMessage) {
+async function generateResponse(chatHistory, userMessage, memory = []) {
     try {
         // Check if user message requires tool usage
         const toolRequests = mcpTools.parseUserMessage(userMessage);
@@ -33,6 +34,16 @@ async function generateResponse(chatHistory, userMessage) {
 
         // Enhance chat history with tool data if available
         let enhancedHistory = [...chatHistory];
+
+        if(memory && memory.length > 0){
+            const memoryText = memory.map(m => m.metadata?.chat).filter(Boolean).join("\n");
+            if(memoryText) {
+                enhancedHistory.unshift({
+                    role: "user",
+                    parts: [{ text: `Previous context: ${memoryText}`}]
+                });
+            }
+        }
         
         if (toolData.length > 0) {
             const toolContext = toolData.map(tool => 
@@ -80,4 +91,18 @@ async function generateResponse(chatHistory, userMessage) {
     // return response.text()
 }
 
-module.exports = generateResponse;
+const ai = new GoogleGenAI({});
+
+async function  generateVector(content) {
+    const response = await ai.models.embedContent({
+        model: 'gemini-embedding-001',
+        contents: content,
+        config: {
+            outputDimensionality: 768
+        }
+    })
+    const embeddingValues = response.embeddings[0].values;
+    return embeddingValues;
+}
+
+module.exports = { generateResponse, generateVector };
