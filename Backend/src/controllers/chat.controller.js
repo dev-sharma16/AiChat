@@ -1,6 +1,7 @@
-const generateResponse = require('../service/ai.service');
+const { generateResponse, generateVector} = require('../service/ai.service');
 const { client } = require("../db/redisDb")
 const Conversation = require("../models/conversation.model")
+const { createMemory, queryMemory } = require("../service/vector.service")
 
 //* Adding Short term memory for per chat session
 const chatHistory = [
@@ -21,29 +22,77 @@ const handleChatMessage = async (socket, data) => {
     try {
         console.log("message is received..!");
         console.log("Received prompt: ", data);
-
+        
+        // saving the user message in stm
         chatHistory.push({
             role: "user",
             parts: { text: data}
         });
 
+        // saving the user message in redis
         await client.rPush(
             socket.data.redisKey,
             JSON.stringify({role:"user", parts: {text: data}})
         )
+
+        // converting the user message into vector 
+        const vectors = await generateVector(data)
+        // console.log("Vectors : ",vectors);
+
+        // checking for related memory in vector databse
+        const memory = await queryMemory({
+            queryVector: vectors,
+            limit: 3,
+            metadata: {
+                user: socket.request.user._id.toString()
+            } 
+        })
+        console.log(memory);
         
-        const response = await generateResponse(chatHistory, data);
+        //saving the converted vector into vector database
+        await createMemory({
+            vectors,
+            metadata: {
+                chat: data,
+                user: socket?.request?.user?._id 
+            },
+            messageId: `${socket?.request?.user?._id}_${Date.now()}` || null,
+        })
+        .then(()=>{console.log("User Message is saved in vectory db")})
+        .catch(err => console.log("Error in saving User Message in vector db:", err))
+
+        // passing the user response to ai 
+        const response = await generateResponse(chatHistory, data, memory);
         console.log("AI-Response: ", response);
         
+        // saving the ai message in stm
         chatHistory.push({
             role: "model",
             parts: { text: response.text}
         });
 
+        // saving the ai message in redis
         await client.rPush(
             socket.data.redisKey,
             JSON.stringify({role:"model", parts: {text: response.text}})
         )
+
+        // converting the ai response into vector 
+        const aiVectors = await generateVector(response.text)
+        // console.log("Vectors : ",vectors);
+
+        //saving the converted vector into vector database
+        await createMemory({
+            vectors: aiVectors,
+            metadata: {
+                chat: response.text,
+                user: "ai" 
+            },
+            messageId: `ai_${Date.now()}`,
+        })
+        .then(()=>{console.log("Ai Message is saved in vectory db")})
+        .catch(err => console.log("Error in saving Ai Message in vector db:", err))
+
 
         //? 'emit' is used to fire the event from the server/client side like sending a response to the user
         socket.emit("message-response", {
