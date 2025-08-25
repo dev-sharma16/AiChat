@@ -1,230 +1,160 @@
 # AI Chat Application
 
-A real-time chat application powered by Google's Gemini AI with a modern React frontend and Node.js backend. Users can have conversations with an AI assistant that maintains context throughout the chat session.
+Real-time AI chat with persistent memory, multi-session support, and live data access via MCP tools.
 
-## ✨ Features
+## Features
 
-- **Real-time Communication**: Instant messaging using Socket.IO
-- **AI-Powered Responses**: Integration with Google Gemini 2.0 Flash model
-- **Chat History**: Maintains conversation context throughout the session
-- **Modern UI**: Clean, responsive interface built with React and Tailwind CSS
-- **Connection Status**: Visual indicators for connection state
-- **Typing Indicators**: Shows when AI is generating a response
-- **Auto-scroll**: Automatically scrolls to latest messages
+- **Multi-Session Chat** - Create, save, and switch between chat sessions
+- **Long-term Memory** - AI remembers conversations across sessions using vector storage
+- **Real-time Data** - Stock prices, weather, time via MCP tools
+- **User Authentication** - Secure login with JWT
+- **Live Updates** - Socket.IO for instant messaging
 
-## 🛠 Tech Stack
+## Tech Stack
 
-### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **Socket.IO** - Real-time bidirectional communication
-- **Google Generative AI** - AI integration with Gemini model
-- **CORS** - Cross-origin resource sharing
-- **dotenv** - Environment variable management
+**Backend:** Node.js, Express, Socket.IO, MongoDB, Redis, Pinecone  
+**Frontend:** React, Vite, Tailwind CSS, Socket.IO Client  
+**AI:** Google Gemini 2.0 Flash, Vector embeddings  
+**APIs:** Alpha Vantage (stocks), Weather API
 
-### Frontend
-- **React 18** - Frontend framework
-- **Vite** - Build tool and dev server
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling framework
-- **Socket.IO Client** - Real-time client communication
-- **Lucide React** - Icon library
+## Quick Start
 
-## 📋 Prerequisites
-
-Before running this application, make sure you have:
-
-- **Node.js** (v14 or higher)
-- **npm** or **yarn**
-- **Google AI API Key** (Gemini API access)
-
-## 🚀 Installation & Setup
-
-### 1. Clone the Repository
+### 1. Clone & Install
 ```bash
-git clone <repository-url>
+git clone <repo-url>
 cd ai-chat-application
+
+# Backend
+cd backend && npm install
+
+# Frontend  
+cd frontend && npm install
 ```
 
-### 2. Backend Setup
-```bash
-# Navigate to backend directory
-cd backend
+### 2. Environment Setup
 
-# Install dependencies
-npm install
-
-# Create environment file
-cp .env.example .env
-```
-
-### 3. Configure Environment Variables
-Create a `.env` file in the backend directory:
+**Backend (.env):**
 ```env
-GEMINI_API_KEY=your_google_gemini_api_key_here
+GEMINI_API_KEY=your_gemini_key
+FRONTEND_URL=http://localhost:5173
+PORT=3000
+VANTAGE_API_KEY=your_stock_api_key
+WEATHER_API_KEY=your_weather_key
+MONGO_URL=your_mongodb_url
+JWT_SECRET=your_jwt_secret
+REDIS_URL=your_redis_url
+PINECONE_API_KEY=your_pinecone_key
 ```
 
-### 4. Frontend Setup
+**Frontend (.env):**
+```env
+VITE_BACKEND_URL=http://localhost:3000
+```
+
+### 3. Run Application
 ```bash
-# Navigate to frontend directory (assuming it's in a separate folder)
-cd frontend
+# Backend (Terminal 1)
+cd backend && npm run dev
 
-# Install dependencies
-npm install
+# Frontend (Terminal 2)  
+cd frontend && npm run dev
 ```
 
-## 🏃‍♂️ Running the Application
+Visit: http://localhost:5173
 
-### Start the Backend Server
-```bash
-cd backend
-npm run dev
-```
-The backend server will start on `http://localhost:3000`
-
-### Start the Frontend Development Server
-```bash
-cd frontend
-npm run dev
-```
-The frontend will start on `http://localhost:5173`
-
-## 🏗 Project Structure
+## Project Structure
 
 ```
 ai-chat-application/
 ├── backend/
 │   ├── src/
-│   │   ├── app.js              # Express app configuration
-│   │   └── service/
-│   │       └── ai.service.js   # Gemini AI service
-│   ├── server.js               # Main server file with Socket.IO
-│   ├── package.json
-│   └── .env                    # Environment variables
-│
+│   │   ├── controllers/     # Auth & chat logic
+│   │   ├── db/             # MongoDB & Redis config
+│   │   ├── middleware/     # Authentication
+│   │   ├── models/         # Database schemas
+│   │   ├── routes/         # API routes
+│   │   ├── service/        # AI, MCP tools, vectors
+│   │   └── socket/         # Socket.IO handlers
+│   ├── server.js
+│   └── package.json
 └── frontend/
     ├── src/
-    │   ├── components/         # React components
-    │   ├── hooks/
-    │   │   └── useSocket.js    # Custom Socket.IO hook
-    │   ├── App.jsx             # Main App component
-    │   ├── main.jsx            # React entry point
-    │   └── index.css           # Global styles
-    ├── package.json
-    └── vite.config.js
+    │   ├── components/     # React components
+    │   ├── config/        # App configuration
+    │   ├── hooks/         # Custom hooks
+    │   ├── pages/         # Page components
+    │   └── store/         # Redux store
+    └── package.json
 ```
 
-## 🔧 API Endpoints
+## API Routes
 
-### REST Endpoints
-- `GET /` - Health check endpoint
+### Authentication (`/api/auth`)
+- `POST /register` - Register user
+- `POST /login` - Login user
+- `GET /user` - Current user (protected)
+- `GET /logout` - Logout (protected)
+- `POST /change-password` - Change password (protected)
 
-### Socket.IO Events
+### Socket Events
 
-#### Client to Server
-- `message` - Send a chat message to the AI
+**Client → Server:**
+- `message` - Send chat message
+- `newChat` - Start new session
+- `reload-chat` - Load previous chat
 
-#### Server to Client
-- `message-response` - Receive AI response
-- `connect` - Connection established
-- `disconnect` - Connection lost
+**Server → Client:**
+- `message-response` - AI response
+- `load-all-chats` - User's chat history
+- `new-chat-started` - New session confirmed
+- `reloaded-chat` - Previous chat loaded
 
-## 💡 How It Works
+## How It Works
 
-1. **Frontend Connection**: React app connects to the backend via Socket.IO
-2. **Message Sending**: User types a message and clicks send
-3. **Real-time Communication**: Message is sent to backend through Socket.IO
-4. **AI Processing**: Backend processes the message using Google Gemini AI
-5. **Context Maintenance**: Chat history is maintained for contextual responses
-6. **Response Delivery**: AI response is sent back to frontend in real-time
-7. **UI Updates**: Frontend displays the conversation with typing indicators
+1. **Authentication** - JWT-based login with HTTP-only cookies
+2. **Chat Sessions** - Create unlimited chats, auto-saved to MongoDB
+3. **Memory System** - Active chats in Redis, embeddings in Pinecone
+4. **AI Processing** - Gemini AI with context from vector memory
+5. **Real-time Data** - MCP tools fetch live stocks/weather/time
 
-## 🎨 Key Components
+## Configuration
 
-### Backend Components
-- **server.js** - Main server setup with Socket.IO integration
-- **app.js** - Express application configuration
-- **ai.service.js** - Google Gemini AI integration service
+**Memory Flow:** Redis (active) → MongoDB (persistent) → Pinecone (vectors)  
+**Transport:** Polling mode for Render compatibility  
+**CORS:** Dynamic origin handling with credentials
 
-### Frontend Components
-- **App.jsx** - Main application container
-- **useSocket.js** - Custom hook for Socket.IO connection management
-- **ChatMessage** - Individual message display component
-- **ChatInput** - Message input component
-- **ConnectionStatus** - Connection state indicator
-- **TypingIndicator** - Shows when AI is typing
+## Deployment
 
-## ⚙️ Configuration
+### Backend (Render)
+- Root directory: `backend`
+- Build: `npm install`
+- Start: `npm start`
+- Add all environment variables
 
-### CORS Configuration
-The application is configured to allow connections from:
-- Frontend: `http://localhost:5173`
-- Methods: GET, POST, PUT, DELETE
-- Credentials: Enabled
+### Frontend (Vercel)
+- Root directory: `frontend`  
+- Framework: Vite
+- Build: `npm run build`
+- Set `VITE_BACKEND_URL` to Render URL
 
-### Socket.IO Configuration
-- Real-time bidirectional communication
-- Automatic reconnection
-- CORS enabled for development
+## Environment Variables
 
-## 🔒 Environment Variables
+| Variable | Description |
+|----------|-------------|
+| `GEMINI_API_KEY` | Google AI API key |
+| `FRONTEND_URL` | Frontend URL for CORS |
+| `VANTAGE_API_KEY` | Stock/crypto data |
+| `WEATHER_API_KEY` | Weather data |
+| `MONGO_URL` | MongoDB connection |
+| `JWT_SECRET` | JWT signing key |
+| `REDIS_URL` | Redis connection |
+| `PINECONE_API_KEY` | Vector database |
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GEMINI_API_KEY` | Google Gemini API key | Yes |
+## Scripts
 
-## 🚨 Troubleshooting
+**Backend:** `npm start` | `npm run dev`  
+**Frontend:** `npm run dev` | `npm run build`
 
-### Common Issues
+## License
 
-1. **Connection Failed**
-   - Ensure backend server is running on port 3000
-   - Check if frontend is trying to connect to the correct URL
-
-2. **AI Not Responding**
-   - Verify your Gemini API key is valid
-   - Check API key permissions and quotas
-
-3. **CORS Errors**
-   - Ensure CORS is properly configured for your frontend URL
-   - Check that credentials are enabled if needed
-
-### Development Tips
-
-- Use browser developer tools to monitor Socket.IO connections
-- Check server logs for API errors
-- Ensure both frontend and backend are running simultaneously
-
-## 📝 Scripts
-
-### Backend Scripts
-- `npm run dev` - Start development server with nodemon
-- `npm test` - Run tests (not implemented)
-
-### Frontend Scripts
-- `npm run dev` - Start Vite development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📜 License
-
-This project is licensed under the ISC License.
-
-## 🙏 Acknowledgments
-
-- Google Gemini AI for providing the AI capabilities
-- Socket.IO for real-time communication
-- React and Vite communities for excellent development tools
-
----
-
-**Note**: Make sure to obtain a valid Google Gemini API key and keep it secure. Never commit API keys to version control.
+ISC License
